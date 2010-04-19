@@ -1,0 +1,103 @@
+<?php
+// $Id$
+
+/**
+ * @file
+ * Comment limit - Limit comments per node type
+ *
+ * @author
+ * Stefan Auditor <stefan.auditor@erdfisch.de>
+ */
+
+/**
+ * Implements hook_perm().
+ */
+function comment_limit_perm() {
+  return array('bypass comment limit');
+}
+
+/**
+ * Implement hook_form_alter().
+ */
+function comment_limit_form_node_type_form_alter(&$form, &$form_state) {
+  $form['comment_limit'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Comment limit'),
+    '#collapsible' => TRUE,
+    '#collapsed' => TRUE,
+  );
+  $form['comment_limit']['comment_limit'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Limit'),
+    '#description' => t('Limit per user comments to the given value, e.g. <em>5</em> or <em>10</em>, give <em>0</em> for no limit.'),
+    '#default_value' => variable_get('comment_limit_' . $form['#node_type']->type, 0),
+  );
+}
+
+/**
+ * Implement hook_form_alter().
+ */
+function comment_limit_form_comment_form_alter(&$form, &$form_state) {
+  global $user;
+
+  // Don't check for limits if user has perm to bypass
+  if (user_access('bypass comment limit')) {
+    return;
+  }
+
+  // Check for limit and remove form
+  $node = node_load(array('nid' => $form['nid']['#value']));
+  if ($result = comment_limit_reached($node, $user)) {
+    // Unset all the form elements
+    $form = array();
+
+    // Explain what we've done here.
+    $form['comment'] = array(
+      '#value' => t('You reached the comment limit for this node.'),
+    );
+  }
+}
+
+/**
+ * Get comment limit for this node type
+ */
+function comment_limit_get($node_type) {
+  return variable_get('comment_limit_' . $node_type, 0);
+}
+
+/**
+ * Get comment limit for this node and user
+ */
+function comment_limit_get_comments($nid, $uid) {
+  $sql = "SELECT COUNT(cid) FROM {node} n
+            INNER JOIN {comments} c ON n.nid = c.nid
+            WHERE n.nid = %d
+              AND c.uid = %d";
+  return db_result(db_query($sql, $nid, $uid));
+}
+
+/**
+ * Has the limit been reached
+ */
+function comment_limit_reached($node, $user) {
+  $limit = comment_limit_get($node->type);
+  $comment_count = comment_limit_get_comments($node->nid, $user->uid);
+  return ($limit != 0 && ($limit <= $comment_count)) ? TRUE : FALSE;
+}
+
+/**
+ * Implement hook_link_alter().
+ */
+function comment_limit_link_alter(&$links, $node) {
+  global $user;
+
+  // Don't check for limits if user has perm to bypass
+  if (user_access('bypass comment limit')) {
+    return;
+  }
+
+  // Check for limits and remove link
+  if (comment_limit_get($node->type) && comment_limit_reached($node, $user)) {
+    unset($links['comment_add']);
+  }
+}

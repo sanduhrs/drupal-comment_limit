@@ -1,0 +1,17 @@
+<?php
+// $Id$
+
+/**
+ * @file
+ * Comment limit - Limit comments per node type
+ *
+ * @author
+ * Stefan Auditor <stefan.auditor@erdfisch.de>
+ */
+
+/**
+ * Implements hook_uninstall().
+ */
+function comment_limit_uninstall() {
+  db_query("DELETE FROM {variable} WHERE name LIKE 'comment_limit%'");
+}
