@@ -1,4 +1,3 @@
-; $Id$
 name = Comment limit
 description = Limits comments per node type
 core = 6.x
