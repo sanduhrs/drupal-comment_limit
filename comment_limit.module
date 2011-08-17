@@ -97,6 +97,6 @@ function comment_limit_link_alter(&$links, $node) {
 
   // Check for limits and remove link
   if (comment_limit_get($node->type) && comment_limit_reached($node, $user)) {
-    unset($links['comment_add']);
+    unset($links['comment_add'], $links['comment_reply']);
   }
 }
