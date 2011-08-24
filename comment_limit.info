@@ -1,3 +1,4 @@
 name = Comment limit
 description = Limits comments per node type
-core = 6.x
+core = 7.x
+dependencies[] = comment
