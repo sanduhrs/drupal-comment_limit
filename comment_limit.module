@@ -18,7 +18,7 @@ function comment_limit_permission() {
 }
 
 /**
- * Implement hook_form_alter().
+ * Implement hook_form_FORM-ID-alter().
  */
 function comment_limit_form_node_type_form_alter(&$form, &$form_state) {
   $form['comment_limit'] = array(
@@ -36,7 +36,7 @@ function comment_limit_form_node_type_form_alter(&$form, &$form_state) {
 }
 
 /**
- * Implement hook_form_alter().
+ * Implement hook_form_FORM-ID-alter().
  */
 function comment_limit_form_comment_form_alter(&$form, &$form_state) {
   global $user;
