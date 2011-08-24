@@ -38,7 +38,7 @@ function comment_limit_node_load($nodes, $types) {
 
   // Don't check for limits if user has perm to bypass
   if (user_access('bypass comment limit')) {
-    // return;
+    return;
   }
 
   foreach ($nodes as $node) {
@@ -97,7 +97,7 @@ function comment_limit_link_alter(&$links, $node) {
 
   // Don't check for limits if user has perm to bypass
   if (user_access('bypass comment limit')) {
-    // return;
+    return;
   }
 
   // Check for limits and remove link
