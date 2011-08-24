@@ -54,6 +54,18 @@ function comment_limit_node_load($nodes, $types) {
 }
 
 /**
+ * Implements hook_node_view().
+ */
+function comment_limit_node_view($node, $view_mode, $langcode) {
+  if (isset($node->comment_limit) && $node->comment_limit) {
+    // Explain what we've done here.
+    $node->content['comments']['comment_form'] = array(
+      '#markup' => t('You have reached the comment limit for this content.'),
+    );
+  }
+}
+
+/**
  * Get comment limit for this node type
  */
 function comment_limit_get($node_type) {
@@ -87,21 +99,4 @@ function comment_limit_reached($node, $user) {
   $limit = comment_limit_get($node->type);
   $comment_count = comment_limit_count_comments($node->nid, $user->uid);
   return ($limit != 0 && ($limit <= $comment_count)) ? TRUE : FALSE;
-}
-
-/**
- * Implement hook_link_alter().
- */
-function comment_limit_link_alter(&$links, $node) {
-  global $user;
-
-  // Don't check for limits if user has perm to bypass
-  if (user_access('bypass comment limit')) {
-    return;
-  }
-
-  // Check for limits and remove link
-  if (comment_limit_get($node->type) && comment_limit_reached($node, $user)) {
-    unset($links['comment_add'], $links['comment_reply']);
-  }
 }
