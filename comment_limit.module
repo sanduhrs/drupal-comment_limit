@@ -6,10 +6,15 @@
  */
 
 /**
- * Implements hook_perm().
+ * Implements hook_permission().
  */
-function comment_limit_perm() {
-  return array('bypass comment limit');
+function comment_limit_permission() {
+  return array(
+    'bypass comment limit' => array(
+      'title' => t('Bypass comment limit'), 
+      'description' => t('Allows a user to bypass the limit set on comments.'),
+    ),
+  );
 }
 
 /**
