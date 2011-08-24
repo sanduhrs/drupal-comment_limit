@@ -41,8 +41,8 @@ function comment_limit_node_load($nodes, $types) {
     // return;
   }
 
-  $node->comment_limit = FALSE;
   foreach ($nodes as $node) {
+    $node->comment_limit = FALSE;
     // Check for limit and remove form
     if ($result = comment_limit_reached($node, $user)) {
       // Close comments
